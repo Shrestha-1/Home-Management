@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Management — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="/messages.js"></script>
+<style>
+:root {
+  --bg:      #080806;
+  --bg2:     #0e0d0a;
+  --bg3:     #141210;
+  --bg4:     #1a1815;
+  --border:  rgba(201,169,110,0.1);
+  --border2: rgba(201,169,110,0.22);
+  --gold:    #C9A96E;
+  --gold2:   #E8D5B0;
+  --text:    #F0EBE3;
+  --text2:   #9A8F82;
+  --text3:   #4A443C;
+  --danger:  #E05C6A;
+  --success: #5BB88A;
+  --radius:  10px;
+  --radius-sm: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 55%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3.5rem;
+  background: var(--bg2);
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.left-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(201,169,110,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 75%, rgba(201,169,110,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.left-watermark {
+  position: absolute;
+  font-family: 'Playfair Display', serif;
+  font-size: 42vw;
+  font-weight: 400;
+  color: rgba(201,169,110,0.025);
+  right: -10vw;
+  bottom: -12vw;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.05em;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.1s forwards;
+}
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--gold), #8B6914);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(201,169,110,0.25);
+}
+.brand-mark svg { width: 18px; height: 18px; fill: var(--bg); }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--text);
+  line-height: 1.2;
+}
+.brand-sub {
+  font-size: 0.6rem;
+  color: var(--gold);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.left-center { position: relative; z-index: 1; }
+
+.left-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1.4rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.left-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 4.5vw, 4.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.45s forwards;
+}
+.left-title em { font-style: italic; color: var(--gold); }
+
+.left-desc {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  line-height: 1.9;
+  color: var(--text2);
+  max-width: 400px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.left-stats {
+  display: flex;
+  gap: 3rem;
+  margin-top: 2.8rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.75s forwards;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--gold);
+  display: block;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.left-bottom {
+  display: flex;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.9s forwards;
+}
+.feature-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+}
+.feature-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── DIVIDER ── */
+.divider-line {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border2) 25%, var(--border2) 75%, transparent);
+  flex-shrink: 0;
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  position: relative;
+}
+.right-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,169,110,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,169,110,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── FORM BOX ── */
+.form-box {
+  width: 100%;
+  max-width: 390px;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.5s forwards;
+}
+
+.form-header { margin-bottom: 2rem; }
+
+.form-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.7rem;
+}
+
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-size: 2.15rem;
+  line-height: 1.1;
+  color: var(--text);
+}
+.form-title em { font-style: italic; color: var(--gold); }
+
+.gold-line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  margin: 1.4rem 0;
+}
+
+.form { display: none; }
+.form.active { display: block; }
+
+.form-group { margin-bottom: 1rem; position: relative; }
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  fill: var(--text3);
+  pointer-events: none;
+  transition: fill 0.3s;
+}
+.form-group:focus-within .input-icon { fill: var(--gold); }
+
+.eye-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.eye-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: var(--text3);
+  transition: fill 0.25s;
+}
+.eye-btn:hover svg { fill: var(--gold); }
+
+input {
+  width: 100%;
+  height: 50px;
+  padding-left: 44px;
+  padding-right: 44px;
+  background: var(--bg4);
+  border: 1px solid rgba(201,169,110,0.12);
+  border-bottom: 1px solid rgba(201,169,110,0.2);
+  color: var(--text);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  outline: none;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+}
+input::placeholder { color: var(--text3); }
+input:focus {
+  border-color: var(--gold);
+  background: var(--bg3);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.08);
+}
+input.error {
+  border-color: var(--danger);
+  background: rgba(224,92,106,0.05);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.95rem;
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  margin-top: 0.4rem;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+.btn-submit:hover {
+  background: var(--gold2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(201,169,110,0.3);
+}
+.btn-submit:disabled { opacity: 0.5; transform: none; box-shadow: none; }
+
+.toggle-link {
+  margin-top: 1.4rem;
+  font-size: 0.78rem;
+  color: var(--text3);
+  text-align: center;
+}
+.toggle-link span {
+  color: var(--gold);
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+.toggle-link span:hover { color: var(--gold2); }
+
+.forgot-link {
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  color: var(--text3);
+  text-align: center;
+}
+.forgot-link span {
+  color: var(--text2);
+  cursor: pointer;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.forgot-link span:hover { color: var(--gold); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .left-panel, .divider-line { display: none; }
+  .right-panel { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-glow"></div>
+  <div class="left-watermark">H</div>
+
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-4v-6h-4v6H6v-9H3l9-8z"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Home</div>
+      <div class="brand-sub">Management</div>
+    </div>
+  </div>
+
+  <div class="left-center">
+    <p class="left-eyebrow">Property Management System</p>
+    <h1 class="left-title">
+      Manage<br>your <em>home</em><br>smarter.
+    </h1>
+    <p class="left-desc">
+      A unified platform to oversee every corner of your property.
+      From maintenance to monitoring — all in one elegant dashboard.
+    </p>
+    <div class="left-stats">
+      <div><span class="stat-num">99%</span><span class="stat-label">Uptime</span></div>
+      <div><span class="stat-num">24/7</span><span class="stat-label">Access</span></div>
+      <div><span class="stat-num">256</span><span class="stat-label">Bit Secure</span></div>
+    </div>
+  </div>
+
+  <div class="left-bottom">
+    <div class="feature-tag"><span class="feature-dot"></span>Secure Login</div>
+    <div class="feature-tag"><span class="feature-dot"></span>Real-time Data</div>
+    <div class="feature-tag"><span class="feature-dot"></span>Full Control</div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="divider-line"></div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="form-box">
+    <div class="form-header">
+      <span class="form-eyebrow">— Welcome</span>
+      <h2 class="form-title" id="formTitle">Sign <em>in</em> to<br>your account</h2>
+    </div>
+    <div class="gold-line"></div>
+
+    <!-- LOGIN FORM -->
+    <form class="form active" id="loginForm" autocomplete="off">
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+        <input type="text" name="username" placeholder="Username" required/>
+      </div>
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-8 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM9 8V6a3 3 0 0 1 6 0v2H9z"/></svg>
+        <input type="password" name="password" id="loginPw" placeholder="Password" required/>
+        <button type="button" class="eye-btn" id="toggleLogin">
+          <svg viewBox="0 0 24 24" id="loginEyeIcon"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+        </button>
+      </div>
+      <button class="btn-submit" type="submit">Sign In</button>
+      <div class="toggle-link">Don't have an account? <span id="showRegister">Register</span></div>
+      <div class="forgot-link"><span id="forgotPw">Forgot your password?</span></div>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form class="form" id="registerForm" autocomplete="off">
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+        <input type="text" name="username" placeholder="Username" required/>
+      </div>
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <input type="email" name="email" placeholder="Email address" required/>
+      </div>
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-8 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM9 8V6a3 3 0 0 1 6 0v2H9z"/></svg>
+        <input type="password" name="password" id="regPw" placeholder="Password" required/>
+        <button type="button" class="eye-btn" id="toggleReg">
+          <svg viewBox="0 0 24 24" id="regEyeIcon"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-8 9a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM9 8V6a3 3 0 0 1 6 0v2H9z"/></svg>
+        <input type="password" name="confirm_password" id="confirmPw" placeholder="Confirm Password" required/>
+        <button type="button" class="eye-btn" id="toggleConfirm">
+          <svg viewBox="0 0 24 24" id="confirmEyeIcon"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+        </button>
+      </div>
+      <button class="btn-submit" type="submit">Create Account</button>
+      <div class="toggle-link">Already have an account? <span id="showLogin">Sign in</span></div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── TOAST BRIDGE → messages.js do all work now ──
+function showToast(msg, type = 'error') {
+  const map = { success: 'success', error: 'error', warning: 'warning', info: 'info' };
+  window.showMessage(msg, map[type] || 'error');
+}
+
+// ── FORM TOGGLE ──
+const loginForm    = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const formTitle    = document.getElementById('formTitle');
+
+document.getElementById('showRegister').addEventListener('click', () => {
+  loginForm.classList.remove('active');
+  registerForm.classList.add('active');
+  formTitle.innerHTML = 'Create <em>your</em><br>account';
+  registerForm.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+});
+
+document.getElementById('showLogin').addEventListener('click', () => {
+  registerForm.classList.remove('active');
+  loginForm.classList.add('active');
+  formTitle.innerHTML = 'Sign <em>in</em> to<br>your account';
+  loginForm.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+});
+
+// ── EYE TOGGLE ──
+const eyeOpen   = 'M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z';
+const eyeClosed = 'M2 2l20 20M6.7 6.7A10 10 0 0 0 2 12s3 7 10 7a9.9 9.9 0 0 0 5.3-1.5M10 10a3 3 0 0 0 4 4M17.4 17.4A10 10 0 0 0 22 12s-3-7-10-7a9.9 9.9 0 0 0-4.4 1';
+
+function makeEyeToggle(btnId, inputId, iconId) {
+  let visible = false;
+  document.getElementById(btnId).addEventListener('click', () => {
+    visible = !visible;
+    document.getElementById(inputId).type = visible ? 'text' : 'password';
+    document.getElementById(iconId).querySelector('path').setAttribute('d', visible ? eyeClosed : eyeOpen);
+  });
+}
+
+makeEyeToggle('toggleLogin',   'loginPw',   'loginEyeIcon');
+makeEyeToggle('toggleReg',     'regPw',     'regEyeIcon');
+makeEyeToggle('toggleConfirm', 'confirmPw', 'confirmEyeIcon');
+
+// ── FORGOT ──
+document.getElementById('forgotPw').addEventListener('click', () => {
+  showToast('Please contact the owner to reset your password.', 'error');
+});
+
+// ── LOGIN SUBMIT ──
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = loginForm.querySelector('button[type=submit]');
+  btn.disabled = true;
+  const data = Object.fromEntries(new FormData(loginForm));
+  loginForm.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+
+  if (!data.username) {
+    showToast('Username required', 'error');
+    loginForm.querySelector("input[name='username']").classList.add('error');
+    btn.disabled = false; return;
+  }
+  if (!data.password) {
+    showToast('Password required', 'error');
+    loginForm.querySelector("input[name='password']").classList.add('error');
+    btn.disabled = false; return;
+  }
+
+  try {
+    const r = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    const j = await r.json();
+    if (!j.success) { showToast(j.message || 'Invalid credentials', 'error'); btn.disabled = false; return; }
+    window.location.href = j.redirect;
+  } catch { showToast('Something went wrong', 'error'); btn.disabled = false; }
+});
+
+// ── REGISTER SUBMIT ──
+registerForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = registerForm.querySelector('button[type=submit]');
+  btn.disabled = true;
+  const data = Object.fromEntries(new FormData(registerForm));
+  registerForm.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+
+  if (data.password !== data.confirm_password) {
+    showToast('Passwords do not match', 'error');
+    registerForm.querySelector("input[name='confirm_password']").classList.add('error');
+    btn.disabled = false; return;
+  }
+
+  try {
+    const r = await fetch('/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    const j = await r.json();
+    if (!j.success) { showToast(j.message || 'Registration failed', 'error'); btn.disabled = false; return; }
+    showToast('Account created!', 'success');
+    document.getElementById('showLogin').click();
+    btn.disabled = false;
+  } catch { showToast('Something went wrong', 'error'); btn.disabled = false; }
+});
+</script>
+</body>
+</html>
